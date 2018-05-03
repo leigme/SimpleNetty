@@ -3,7 +3,10 @@ package me.leig.simplenetty.handler;
 import java.util.List;
 
 /**
+ * 内容处理器
+ *
  * @author leig
+ *
  */
 
 public interface ContentHandler {

@@ -12,24 +12,35 @@ public interface MessageListener {
     /**
      * 发送消息
      *
-     * @param userId
-     * @param receiverId
-     * @param msgType
-     * @param msg
+     * @param nettyMessage
+     *
      */
-    void sendMessage(String userId, String receiverId, int msgType, String msg);
+    void sendMessage(NettyMessage nettyMessage);
 
     /**
      * 接收消息
      *
-     * @param nettyMessage
+     * @param senderId
+     * @param message
      */
-    void receiveMessage(NettyMessage nettyMessage);
+    void receiveMessage(int senderId, String message);
+
+    /**
+     * 连接成功
+     *
+     */
+    void connectSuccess();
+
+    /**
+     * 连接失败
+     *
+     */
+    void connectFailure(NettyMessage nettyMessage);
 
     /**
      * 断开连接的信息
      *
      * @param ctx
      */
-    void endMessage(ChannelHandlerContext ctx);
+    void disconnect(ChannelHandlerContext ctx);
 }

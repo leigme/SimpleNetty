@@ -1,4 +1,4 @@
-package me.leig.simplenetty.server;
+package me.leig.simplenetty.netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;

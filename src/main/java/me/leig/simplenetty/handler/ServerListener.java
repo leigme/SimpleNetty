@@ -14,11 +14,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 客户端消息发送监听抽象类
+ * 服务端消息发送监听抽象类
  *
  * @author leig
+ *
  */
-public abstract class ServerListener implements MessageListener {
+public enum ServerListener implements MessageListener {
+
+    INSTANCE;
+
+    ServerListener() {}
 
     private static Logger log = Logger.getLogger(ServerListener.class);
 
@@ -28,22 +33,77 @@ public abstract class ServerListener implements MessageListener {
     // 客户端信息集合
     private static Map<String, CtxData> mMap = new ConcurrentHashMap<>();
 
-    // 消息回调接口
-    private ContentHandler mContentHandler;
+    @Override
+    public void sendMessage(NettyMessage nettyMessage) {
 
-    public ServerListener(CtxData ctxData, ContentHandler contentHandler) {
-        this.mCtxData = ctxData;
-        this.mContentHandler = contentHandler;
     }
 
-    /**
+    @Override
+    public void receiveMessage(NettyMessage nettyMessage) {
+        switch (nettyMessage.getMsgType()) {
+            case Constant.MSG_TYPE_FIRST:
+                serverToClients();
+                break;
+            case Constant.MSG_TYPE_HEARTBEAT:
+                serverToClients();
+                break;
+            case Constant.MSG_TYPE_TEXT:
+
+                if (null == nettyMessage.getreceiverId() || "".equals(nettyMessage.getreceiverId())) {
+                    clientToServer();
+                    return;
+                }
+
+                if (null == mMap.get(nettyMessage.getreceiverId())) {
+                    serverToClients();
+                    return;
+                }
+
+                clientToClients();
+                break;
+        }
+    }
+
+    @Override
+    public void connectSuccess(NettyMessage nettyMessage) {
+
+    }
+
+    @Override
+    public void connectFailure(NettyMessage nettyMessage) {
+
+    }
+
+    @Override
+    public void disconnect(ChannelHandlerContext ctx) {
+
+    }
+
+    void serverToClients() {}
+
+    void clientToServer() {}
+
+    void clientToClients() {}
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    *//**
      * 向客户端发送一条消息
      *
      * @param userId
      * @param receiverId
      * @param msgType
      * @param msg
-     */
+     *//*
     @Override
     public void sendMessage(String userId, String receiverId, int msgType, String msg) {
         if (null == mMap.get(receiverId)) {
@@ -82,11 +142,11 @@ public abstract class ServerListener implements MessageListener {
         this.sendMessage(mCtxData.getUserId(), msg);
     }
 
-    /**
+    *//**
      * 接收客户端发来的消息
      *
      * @param nettyMessage
-     */
+     *//*
     @Override
     public void receiveMessage(NettyMessage nettyMessage) {
         switch (nettyMessage.getMsgType()) {
@@ -132,11 +192,21 @@ public abstract class ServerListener implements MessageListener {
         }
     }
 
-    /**
+    @Override
+    public void connectSuccess() {
+
+    }
+
+    @Override
+    public void connectFailure() {
+
+    }
+
+    *//**
      * 保存客户端信息
      *
      * @param ctxData
-     */
+     *//*
     public void saveCtxData(CtxData ctxData) {
 
         mMap.put(ctxData.getUserId(), ctxData);
@@ -154,11 +224,11 @@ public abstract class ServerListener implements MessageListener {
         mContentHandler.obtainUsers(userIds);
     }
 
-    /**
+    *//**
      * 同客户端断开连接的方法
      *
      * @param ctx
-     */
+     *//*
     @Override
     public void endMessage(ChannelHandlerContext ctx) {
         String userId = null;
@@ -195,5 +265,5 @@ public abstract class ServerListener implements MessageListener {
 
     public static void setmMap(Map<String, CtxData> mMap) {
         ServerListener.mMap = mMap;
-    }
+    }*/
 }

@@ -15,35 +15,29 @@ public class NettyMessage {
 	// 消息类型类型
 	private int msgType;
 	// 消息发送者Id
-	private String senderId = "";
+	private String senderId;
 	// 消息接收者Id
-	private String receiverId = "";
+	private String receiverId;
 	// 消息执行结果
 	private String resStatus = Constant.RES_OK;
 	// 消息执行结果 消息 如果没有错误，就是正常的空字符串 如果有错误就错误信息
 	private String resMsg = "";
 	// 消息数据
-	private byte[] data = new byte[0];
+	private byte[] data;
 
 	public NettyMessage() {
-		super();
+		this("", Constant.MSG_TYPE_TEXT, "", new byte[0]);
 	}
 
 	public NettyMessage(String senderId, int msgType, byte[] data) {
-		this.senderId = senderId;
-		this.setMsgType(msgType);
-		if (null == data) {
-			this.data = new byte[0];
-		} else {
-			this.data = data;
-		}
+		this(senderId, msgType, "", data);
 	}
 
-	public NettyMessage(String senderId, String receiverId, int msgType, byte[]
+	public NettyMessage(String senderId, int msgType, String receiverId, byte[]
 			data) {
 		this.senderId = senderId;
-		this.receiverId = receiverId;
 		this.msgType = msgType;
+		this.receiverId = receiverId;
 		if (null == data) {
 			this.data = new byte[0];
 		} else {
@@ -216,11 +210,11 @@ public class NettyMessage {
 		this.msgType = msgType;
 	}
 
-	public String getreceiverId() {
+	public String getReceiverId() {
 		return receiverId;
 	}
 
-	public void setreceiverId(String receiverId) {
+	public void setReceiverId(String receiverId) {
 		this.receiverId = receiverId;
 	}
 

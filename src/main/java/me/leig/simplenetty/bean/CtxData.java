@@ -3,19 +3,20 @@ package me.leig.simplenetty.bean;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
+ * 连接对象信息
+ *
  * @author leig
+ *
  */
 
 public class CtxData {
 
     // 连接用户编号
     private String userId;
+    // 用户名称
+    private String userName;
     // 本地地址
     private String localIP;
-    // 远端地址
-    private String remoteIP;
-    // 连接端口
-    private int port = 9009;
     // 连接时间
     private String time;
     // 连接备注
@@ -24,6 +25,14 @@ public class CtxData {
     private ChannelHandlerContext ctx;
 
     public CtxData() {}
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public String getUserId() {
         return userId;
@@ -39,22 +48,6 @@ public class CtxData {
 
     public void setLocalIP(String localIP) {
         this.localIP = localIP;
-    }
-
-    public String getRemoteIP() {
-        return remoteIP;
-    }
-
-    public void setRemoteIP(String remoteIP) {
-        this.remoteIP = remoteIP;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public String getTime() {

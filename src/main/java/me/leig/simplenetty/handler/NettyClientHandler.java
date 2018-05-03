@@ -10,7 +10,9 @@ import me.leig.simplenetty.comm.NettyException;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 客户端消息处理类
@@ -45,7 +47,13 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
         NettyMessage nm = new NettyMessage();
         nm.setSenderId(mClientListener.getCtxData().getUserId());
         nm.setMsgType(Constant.MSG_TYPE_FIRST);
-        String msg = mClientListener.getCtxData().getLocalIP();
+        String msg = mClientListener.getCtxData().getUserName()
+                + Constant.SEG
+                + mClientListener.getCtxData().getLocalIP()
+                + Constant.SEG
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+                + Constant.SEG
+                + mClientListener.getCtxData().getRemark();
         nm.setData(msg.getBytes());
         ctx.channel().writeAndFlush(nm);
         log.info("与服务器端建立通道");
@@ -54,7 +62,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        mClientListener.endMessage(ctx);
+        mClientListener.disconnect(ctx);
     }
 
     /**
@@ -67,24 +75,42 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage nettyMessage) throws Exception {
         if (null != mClientListener) {
+            String[] msgData;
             switch (nettyMessage.getMsgType()) {
                 case Constant.MSG_TYPE_FIRST:
                     CtxData ctxData = new CtxData();
                     ctxData.setUserId(nettyMessage.getSenderId());
-                    String[] msgData = new String(nettyMessage.getData()).split
+                    msgData = new String(nettyMessage.getData()).split
                             (Constant.SEG);
-                    if (2 < msgData.length) {
+                    if (4 != msgData.length) {
                         throw new NettyException(this.getClass(), "初始化消息格式错误!!!");
                     }
-                    ctxData.setLocalIP(msgData[0]);
-                    ctxData.setPort(Integer.parseInt(msgData[1]));
-                    ctxData.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                    ctxData.setUserName(msgData[0]);
+                    ctxData.setLocalIP(msgData[1]);
+                    ctxData.setTime(msgData[2]);
+                    ctxData.setRemark(msgData[3]);
                     ctxData.setCtx(ctx);
-                    mClientListener.saveCtxData(ctxData);
-                    mClientListener.obtainUsers();
+                    mClientListener.setsCtxData(ctxData);
+                    break;
+                case Constant.MSG_TYPE_USERLIST:
+                    msgData = new String(nettyMessage.getData()).split(Constant.CONN);
+                    List<CtxData> userDatas = new ArrayList<>();
+                    for (String data: msgData) {
+                        String[] userIds = data.split(Constant.SEG);
+                        if (4 != userIds.length) {
+                            throw new NettyException(this.getClass(), "初始化消息格式错误!!!");
+                        }
+                        CtxData userData = new CtxData();
+                        userData.setUserName(userIds[0]);
+                        userData.setLocalIP(userIds[1]);
+                        userData.setTime(userIds[2]);
+                        userData.setRemark(userIds[3]);
+                        userDatas.add(userData);
+                    }
+                    mClientListener.updateUserList(userDatas);
                     break;
                 default:
-                    mClientListener.receiveMessage(nettyMessage);
+                    mClientListener.receiveMessage(Integer.parseInt(nettyMessage.getSenderId()), new String(nettyMessage.getData()));
                     break;
             }
         }

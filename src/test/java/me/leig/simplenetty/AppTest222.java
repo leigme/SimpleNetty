@@ -1,7 +1,5 @@
 package me.leig.simplenetty;
 
-import static org.junit.Assert.assertTrue;
-
 import io.netty.channel.ChannelHandlerContext;
 import me.leig.simplenetty.bean.CtxData;
 import me.leig.simplenetty.handler.ClientListener;
@@ -9,10 +7,12 @@ import me.leig.simplenetty.handler.ConnectListener;
 import me.leig.simplenetty.netty.NettyClient;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Unit test for simple App.
  */
-public class AppTest {
+public class AppTest222 {
     /**
      * Rigorous Test :-)
      */
@@ -23,8 +23,8 @@ public class AppTest {
         ClientListener clientListener = ClientListener.INSTANCE;
 
         CtxData ctxData = new CtxData();
-        ctxData.setUserId("1729186");
-        ctxData.setUserName("王磊家长");
+        ctxData.setUserId("1729184");
+        ctxData.setUserName("王磊学生");
         ctxData.setLocalIP("192.168.0.155");
         ctxData.setRemark("备注哦");
         clientListener.setCtxData(ctxData);

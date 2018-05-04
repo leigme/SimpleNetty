@@ -56,13 +56,24 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
                 + mClientListener.getCtxData().getRemark();
         nm.setData(msg.getBytes());
         ctx.channel().writeAndFlush(nm);
+        if (null != mClientListener.getConnectListener()) {
+            mClientListener.getConnectListener().connectSuccess();
+        }
         log.info("与服务器端建立通道");
     }
 
+    /**
+     * 断开连接
+     *
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        mClientListener.disconnect(ctx);
+        if (null != mClientListener.getConnectListener()) {
+            mClientListener.getConnectListener().connectFailure();
+        }
     }
 
     /**
@@ -126,6 +137,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
+        if (null != mClientListener.getConnectListener()) {
+            mClientListener.getConnectListener().disconnect(ctx);
+        }
         log.error(cause.getMessage());
     }
 

@@ -12,6 +12,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import me.leig.simplenetty.bean.NettyDecoder;
 import me.leig.simplenetty.bean.NettyEncoder;
 import me.leig.simplenetty.handler.ClientListener;
+import me.leig.simplenetty.handler.ConnectListener;
 import me.leig.simplenetty.handler.NettyClientHandler;
 import org.apache.log4j.Logger;
 
@@ -25,12 +26,12 @@ public class NettyClient {
 
     private String mHost;
     private int mPort;
-    private ClientListener mClientListener;
+    public ClientListener mClientListener;
 
-    public NettyClient(ClientListener mClientListener) {
-        this.mHost = mClientListener.getCtxData().getRemoteIP();
-        this.mPort = mClientListener.getCtxData().getPort();
-        this.mClientListener = mClientListener;
+    public NettyClient(String remoteIP, int port, ClientListener clientListener) {
+        this.mHost = remoteIP;
+        this.mPort = port;
+        this.mClientListener = clientListener;
     }
 
     public void startConnect() throws Exception {
@@ -58,7 +59,11 @@ public class NettyClient {
         } catch (Exception e) {
             System.out.println("=========>" + e.getMessage());
         } finally {
-
+            workGroup.shutdownGracefully();
         }
+    }
+
+    public void setConnectListener(ConnectListener connectListener) {
+        mClientListener.setConnectListener(connectListener);
     }
 }

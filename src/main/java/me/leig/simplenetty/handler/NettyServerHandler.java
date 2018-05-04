@@ -7,9 +7,6 @@ import me.leig.simplenetty.bean.NettyMessage;
 import me.leig.simplenetty.comm.Constant;
 import org.apache.log4j.Logger;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * 服务器消息处理类
  *
@@ -40,12 +37,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        NettyMessage nm = new NettyMessage();
-        nm.setSenderId(mServerListener.getCtxData().getUserId());
-        nm.setMsgType(Constant.MSG_TYPE_FIRST);
-        String sb = mServerListener.getCtxData().getLocalIP() + Constant.SEG + mServerListener.getCtxData().getPort();
-        nm.setData(sb.getBytes());
-        ctx.channel().writeAndFlush(nm);
+        if (null != mServerListener.getConnectListener()) {
+            mServerListener.getConnectListener().connectSuccess();
+        }
         log.info("与客户端建立通道");
     }
 
@@ -58,7 +52,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        mServerListener.endMessage(ctx);
+        mServerListener.disconnect(ctx);
         log.info("客户端离线了...");
     }
 
@@ -71,27 +65,49 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
      */
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyMessage nettyMessage) throws Exception {
-        if (null != nettyMessage) {
-            switch (nettyMessage.getMsgType()) {
-                case Constant.MSG_TYPE_FIRST:
-                    CtxData ctxData = new CtxData();
-                    ctxData.setUserId(nettyMessage.getSenderId());
-                    String msg = new String(nettyMessage.getData());
-                    ctxData.setLocalIP(msg);
-                    ctxData.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                    ctxData.setCtx(channelHandlerContext);
-                    mServerListener.saveCtxData(ctxData);
-                    break;
-                case Constant.MSG_TYPE_HEARTBEAT:
-                    NettyMessage heartbeatMessage = new NettyMessage();
-                    heartbeatMessage.setMsgType(Constant.MSG_TYPE_HEARTBEAT);
-                    heartbeatMessage.setData("@@".getBytes());
-                    channelHandlerContext.channel().writeAndFlush(heartbeatMessage);
-                    break;
-                default:
-                    mServerListener.receiveMessage(nettyMessage);
-                    break;
+        try {
+            if (null != nettyMessage) {
+                switch (nettyMessage.getMsgType()) {
+                    case Constant.MSG_TYPE_FIRST:
+                        CtxData ctxData = new CtxData();
+                        ctxData.setUserId(nettyMessage.getSenderId());
+                        String data = new String(nettyMessage.getData());
+                        String[] msgs = data.split(Constant.SEG);
+                        ctxData.setUserName(msgs[0]);
+                        ctxData.setLocalIP(msgs[1]);
+                        ctxData.setTime(msgs[2]);
+                        ctxData.setRemark(msgs[3]);
+                        ctxData.setCtx(channelHandlerContext);
+                        mServerListener.saveCtxData(ctxData);
+                        break;
+                    case Constant.MSG_TYPE_HEARTBEAT:
+                        NettyMessage heartbeatMessage = new NettyMessage();
+                        heartbeatMessage.setMsgType(Constant.MSG_TYPE_HEARTBEAT);
+                        heartbeatMessage.setData("@@".getBytes());
+                        channelHandlerContext.channel().writeAndFlush(heartbeatMessage);
+                        break;
+                    case Constant.MSG_TYPE_USERLIST:
+                        mServerListener.getUserList(Integer.parseInt(nettyMessage.getSenderId()));
+                        break;
+                    case Constant.MSG_TYPE_TEXT:
+                        String receiverId = nettyMessage.getReceiverId();
+                        if (null == receiverId || "".equals(receiverId)) {
+                            int userId = Integer.parseInt(nettyMessage.getSenderId());
+                            mServerListener.receiveMessage(userId, new String(nettyMessage.getData()));
+                        } else {
+                            int senderId = Integer.parseInt(nettyMessage.getSenderId());
+                            int rId = Integer.parseInt(receiverId);
+                            mServerListener.clientToClient(senderId, rId, new String(nettyMessage.getData()));
+                        }
+                        break;
+                    default:
+                        log.info("channelRead0() type is default [" + nettyMessage.getSenderId() + "说了: " + new String(nettyMessage.getData()) + "]");
+                        break;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("channelRead0() failed: " + e.getMessage());
         }
     }
 
@@ -105,6 +121,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
+        if (null != mServerListener.getConnectListener()) {
+            mServerListener.getConnectListener().connectFailure();
+        }
         log.error(cause.getMessage());
     }
 }

@@ -10,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import me.leig.simplenetty.bean.NettyDecoder;
 import me.leig.simplenetty.bean.NettyEncoder;
+import me.leig.simplenetty.handler.ConnectListener;
 import me.leig.simplenetty.handler.NettyServerHandler;
 import me.leig.simplenetty.handler.ServerListener;
 import org.apache.log4j.Logger;
@@ -23,10 +24,14 @@ public class NettyServer {
     private final static Logger log = Logger.getLogger(NettyServer.class);
 
     private int mPort;
-    private ServerListener mServerListener;
+    public ServerListener mServerListener;
 
     public NettyServer(ServerListener serverListener) {
-        this.mPort = serverListener.getCtxData().getPort();
+        this(8099, serverListener);
+    }
+
+    public NettyServer(int port, ServerListener serverListener) {
+        this.mPort = port;
         this.mServerListener = serverListener;
     }
 
@@ -62,5 +67,9 @@ public class NettyServer {
             bossGroup.shutdownGracefully();
             workGroup.shutdownGracefully();
         }
+    }
+
+    public void setConnectListener(ConnectListener connectListener) {
+        mServerListener.setConnectListener(connectListener);
     }
 }

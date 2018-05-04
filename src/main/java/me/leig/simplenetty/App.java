@@ -1,7 +1,8 @@
 package me.leig.simplenetty;
 
+import io.netty.channel.ChannelHandlerContext;
 import me.leig.simplenetty.bean.CtxData;
-import me.leig.simplenetty.handler.ContentHandler;
+import me.leig.simplenetty.handler.ConnectListener;
 import me.leig.simplenetty.handler.ServerListener;
 import me.leig.simplenetty.netty.NettyServer;
 import me.leig.simplenetty.tool.Config;
@@ -37,50 +38,39 @@ public class App {
 
             CtxData ctxData = new CtxData();
 
-            ctxData.setPort(config.port);
+            ctxData.setUserId("");
+            ctxData.setUserName("");
+            ctxData.setLocalIP("192.168.0.155");
+            ctxData.setRemark("服务器端");
 
-            NettyServer server = new NettyServer(new Server(ctxData, new ServerHandler()));
+            ServerListener serverListener = ServerListener.INSTANCE;
+
+            serverListener.setCtxData(ctxData);
+
+            serverListener.setConnectListener(new ConnectListener() {
+                @Override
+                public void connectSuccess() {
+
+                }
+
+                @Override
+                public void connectFailure() {
+
+                }
+
+                @Override
+                public void disconnect(ChannelHandlerContext ctx) {
+
+                }
+            });
+
+            NettyServer server = new NettyServer(serverListener);
 
             server.startUp();
 
         } catch (Exception e) {
             e.printStackTrace();
             log.error("config failed: " + e.getMessage());
-        }
-    }
-
-    static class Server extends ServerListener {
-
-        public Server(CtxData ctxData, ContentHandler contentHandler) {
-            super(ctxData, contentHandler);
-        }
-    }
-
-    static class ServerHandler implements ContentHandler {
-
-        @Override
-        public void obtainUsers(List<String> userIds) {
-
-        }
-
-        @Override
-        public void receiveContent(String content) {
-
-        }
-
-        @Override
-        public void endConnect(String msg) {
-
-        }
-
-        @Override
-        public void addUser(String userId) {
-
-        }
-
-        @Override
-        public void replay(String userId) {
-
         }
     }
 }

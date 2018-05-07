@@ -27,7 +27,7 @@ public class AppTest {
         CtxData ctxData = new CtxData();
         ctxData.setUserId("1729186");
         ctxData.setUserName("王磊家长");
-        ctxData.setLocalIP("192.168.0.155");
+        ctxData.setLocalIP("192.168.0.137");
         ctxData.setRemark("备注哦");
         clientListener.setCtxData(ctxData);
 
@@ -63,7 +63,7 @@ public class AppTest {
             }
         });
 
-        NettyClient nettyClient = new NettyClient("192.168.0.155", 8099, clientListener);
+        NettyClient nettyClient = new NettyClient("192.168.0.137", 8099, clientListener);
 
         nettyClient.startConnect();
 

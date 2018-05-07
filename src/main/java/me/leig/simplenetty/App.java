@@ -40,7 +40,7 @@ public class App {
 
             ctxData.setUserId("");
             ctxData.setUserName("");
-            ctxData.setLocalIP("192.168.0.155");
+            ctxData.setLocalIP(config.localIP);
             ctxData.setRemark("服务器端");
 
             ServerListener serverListener = ServerListener.INSTANCE;
@@ -79,7 +79,7 @@ public class App {
                 }
             });
 
-            NettyServer server = new NettyServer(serverListener);
+            NettyServer server = new NettyServer(config.port, serverListener);
 
             server.startUp();
 

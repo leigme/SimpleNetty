@@ -63,7 +63,7 @@ public class AppTest222 {
             }
         });
 
-        NettyClient nettyClient = new NettyClient("192.168.0.155", 8099, clientListener);
+        NettyClient nettyClient = new NettyClient("192.168.0.137", 8099, clientListener);
 
         nettyClient.startConnect();
 

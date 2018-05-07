@@ -64,7 +64,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
      * @throws Exception
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyMessage nettyMessage) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyMessage nettyMessage) {
         try {
             if (null != nettyMessage) {
                 switch (nettyMessage.getMsgType()) {
@@ -119,7 +119,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<NettyMessage
      * @throws Exception
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         if (null != mServerListener.getConnectListener()) {
             mServerListener.getConnectListener().connectFailure();

@@ -34,7 +34,7 @@ public class App {
                 return;
             }
 
-            log.info("config parse() success: " + config.version);
+            log.info("config parse() success: => version[" + config.version + "] ip[" + config.localIP + "] port[" + config.port + "]");
 
             CtxData ctxData = new CtxData();
 

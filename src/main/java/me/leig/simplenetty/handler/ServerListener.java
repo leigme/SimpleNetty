@@ -67,14 +67,19 @@ public enum ServerListener implements MessageListener {
                 log.info(entry.getKey() + " disconnect");
             }
         }
-        // 通知其他用户更新用户列表
+
+        // 通知其他用户离线用户信息
         for (Map.Entry<String, CtxData> entry: mMap.entrySet()) {
-            getUserList(Integer.parseInt(entry.getKey()));
             NettyMessage nettyMessage = new NettyMessage();
-            nettyMessage.setMsgType(Constant.MSG_TYPE_REMOVEUSER);
+            nettyMessage.setMsgType(Constant.MSG_TYPE_USERLIST);
             nettyMessage.setReceiverId(entry.getKey());
             nettyMessage.setData(msg.getBytes());
             sendMessage(nettyMessage);
+        }
+
+        // 通知其他用户更新用户列表
+        for (Map.Entry<String, CtxData> entry: mMap.entrySet()) {
+            getUserList(Integer.parseInt(entry.getKey()));
         }
         log.info("disconnect() run");
     }
@@ -127,6 +132,9 @@ public enum ServerListener implements MessageListener {
         }
         mConnectListener.addUserInfo(ctxData);
         mMap.put(ctxData.getUserId(), ctxData);
+        for (Map.Entry<String, CtxData> entry : mMap.entrySet()) {
+            getUserList(Integer.parseInt(entry.getKey()));
+        }
     }
 
     public final void getUserList(int userId) {

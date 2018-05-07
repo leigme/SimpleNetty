@@ -49,7 +49,9 @@ public class AppTest {
 
             @Override
             public void getUserList(List<CtxData> ctxDataList) {
-
+                for (CtxData cd: ctxDataList) {
+                    System.out.print(cd.getUserName());
+                }
             }
 
             @Override
@@ -63,7 +65,7 @@ public class AppTest {
             }
         });
 
-        NettyClient nettyClient = new NettyClient("192.168.0.137", 8099, clientListener);
+        NettyClient nettyClient = new NettyClient("192.168.0.155", 8099, clientListener);
 
         nettyClient.startConnect();
 

@@ -7,6 +7,8 @@ import me.leig.simplenetty.handler.ConnectListener;
 import me.leig.simplenetty.netty.NettyClient;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -43,6 +45,21 @@ public class AppTest222 {
             @Override
             public void disconnect(ChannelHandlerContext ctx) {
 
+            }
+
+            @Override
+            public void getUserList(List<CtxData> ctxDataList) {
+
+            }
+
+            @Override
+            public void addUserInfo(CtxData ctxData) {
+                System.out.print(ctxData.getUserName());
+            }
+
+            @Override
+            public void removeUserInfo(CtxData ctxData) {
+                System.out.print(ctxData.getUserName());
             }
         });
 

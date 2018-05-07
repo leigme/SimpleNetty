@@ -33,8 +33,11 @@ public enum ClientListener implements MessageListener {
     private ConnectListener mConnectListener;
 
     public final void updateUserList(List<CtxData> userDatas) {
-
         users = userDatas;
+        mConnectListener.getUserList(users);
+        for (CtxData ctxData: users) {
+            log.info("===>" + ctxData.getUserName());
+        }
     }
 
     @Override
@@ -49,6 +52,14 @@ public enum ClientListener implements MessageListener {
 
     public void disconnect(ChannelHandlerContext ctx) {
         log.info("disconnect() run");
+    }
+
+    public final void addUser(CtxData ctxData) {
+        mConnectListener.addUserInfo(ctxData);
+    }
+
+    public final void removeUser(CtxData ctxData) {
+        mConnectListener.removeUserInfo(ctxData);
     }
 
     /**

@@ -86,10 +86,11 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyMessage nettyMessage) throws Exception {
         if (null != mClientListener) {
+            CtxData ctxData;
             String[] msgData;
             switch (nettyMessage.getMsgType()) {
                 case Constant.MSG_TYPE_FIRST:
-                    CtxData ctxData = new CtxData();
+                    ctxData = new CtxData();
                     ctxData.setUserId(nettyMessage.getSenderId());
                     msgData = new String(nettyMessage.getData()).split
                             (Constant.SEG);
@@ -103,19 +104,46 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<NettyMessage
                     ctxData.setCtx(ctx);
                     mClientListener.setsCtxData(ctxData);
                     break;
+                case Constant.MSG_TYPE_ADDUSER:
+                    ctxData = new CtxData();
+                    String[] addUser = new String(nettyMessage.getData()).split(Constant.SEG);
+                    if (5 != addUser.length) {
+                        throw new NettyException(this.getClass(), "初始化消息格式错误!!!");
+                    }
+                    ctxData.setUserId(addUser[0]);
+                    ctxData.setUserName(addUser[1]);
+                    ctxData.setLocalIP(addUser[2]);
+                    ctxData.setTime(addUser[3]);
+                    ctxData.setRemark(addUser[4]);
+                    mClientListener.addUser(ctxData);
+                    break;
+                case Constant.MSG_TYPE_REMOVEUSER:
+                    ctxData = new CtxData();
+                    String[] removeUser = new String(nettyMessage.getData()).split(Constant.SEG);
+                    if (5 != removeUser.length) {
+                        throw new NettyException(this.getClass(), "初始化消息格式错误!!!");
+                    }
+                    ctxData.setUserId(removeUser[0]);
+                    ctxData.setUserName(removeUser[1]);
+                    ctxData.setLocalIP(removeUser[2]);
+                    ctxData.setTime(removeUser[3]);
+                    ctxData.setRemark(removeUser[4]);
+                    mClientListener.removeUser(ctxData);
+                    break;
                 case Constant.MSG_TYPE_USERLIST:
                     msgData = new String(nettyMessage.getData()).split(Constant.CONN);
                     List<CtxData> userDatas = new ArrayList<>();
                     for (String data: msgData) {
                         String[] userIds = data.split(Constant.SEG);
-                        if (4 != userIds.length) {
+                        if (5 != userIds.length) {
                             throw new NettyException(this.getClass(), "初始化消息格式错误!!!");
                         }
                         CtxData userData = new CtxData();
-                        userData.setUserName(userIds[0]);
-                        userData.setLocalIP(userIds[1]);
-                        userData.setTime(userIds[2]);
-                        userData.setRemark(userIds[3]);
+                        userData.setUserId(userIds[0]);
+                        userData.setUserName(userIds[1]);
+                        userData.setLocalIP(userIds[2]);
+                        userData.setTime(userIds[3]);
+                        userData.setRemark(userIds[4]);
                         userDatas.add(userData);
                     }
                     mClientListener.updateUserList(userDatas);

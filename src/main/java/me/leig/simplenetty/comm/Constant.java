@@ -33,9 +33,19 @@ public interface Constant {
     int MSG_TYPE_REPLY = 12;
 
     /**
+     * 注册用户
+     */
+    int MSG_TYPE_ADDUSER = 101;
+
+    /**
+     * 移除用户
+     */
+    int MSG_TYPE_REMOVEUSER = 102;
+
+    /**
      * 用户列表
      */
-    int MSG_TYPE_USERLIST = 101;
+    int MSG_TYPE_USERLIST = 103;
 
     /**
      * 文字消息

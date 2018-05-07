@@ -62,6 +62,21 @@ public class App {
                 public void disconnect(ChannelHandlerContext ctx) {
 
                 }
+
+                @Override
+                public void getUserList(List<CtxData> ctxDataList) {
+
+                }
+
+                @Override
+                public void addUserInfo(CtxData ctxData) {
+
+                }
+
+                @Override
+                public void removeUserInfo(CtxData ctxData) {
+
+                }
             });
 
             NettyServer server = new NettyServer(serverListener);
